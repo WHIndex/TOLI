@@ -1,0 +1,64 @@
+[submodule "src/competitor/btree/src"]
+	path = src/competitor/btree/src
+	url = https://github.com/WHIndex/ToliIndex.git
+	branch = btree
+[submodule "src/competitor/pgm/src"]
+	path = src/competitor/pgm/src
+	url = https://github.com/WHIndex/ToliIndex.git
+	branch = pgm
+[submodule "src/competitor/alex/src"]
+	path = src/competitor/alex/src
+	url = https://github.com/WHIndex/ToliIndex.git
+	branch = alex
+[submodule "src/competitor/lipp/src"]
+	path = src/competitor/lipp/src
+	url = https://github.com/WHIndex/ToliIndex.git
+	branch = lipp
+[submodule "src/competitor/art/src"]
+	path = src/competitor/art/src
+	url = https://github.com/WHIndex/ToliIndex.git
+	branch = art
+[submodule "src/competitor/dytis/src"]
+	path = src/competitor/dytis/src
+	url = https://github.com/WHIndex/ToliIndex.git
+	branch = dytis
+[submodule "src/competitor/dili/src"]
+	path = src/competitor/dili/src
+	url = https://github.com/WHIndex/ToliIndex.git
+	branch = dili
+[submodule "src/competitor/alexolc/src"]
+	path = src/competitor/alexolc/src
+	url = https://github.com/WHIndex/ToliIndex.git
+	branch = alexolc
+[submodule "src/competitor/artolc/src"]
+	path = src/competitor/artolc/src
+	url = https://github.com/WHIndex/ToliIndex.git
+	branch = artolc
+[submodule "src/competitor/btreeolc/src"]
+	path = src/competitor/btreeolc/src
+	url = https://github.com/WHIndex/ToliIndex.git
+	branch = btreeolc
+[submodule "src/competitor/findex/src"]
+	path = src/competitor/findex/src
+	url = https://github.com/WHIndex/ToliIndex.git
+	branch = findex
+[submodule "src/competitor/xindex/src"]
+	path = src/competitor/xindex/src
+	url = https://github.com/WHIndex/ToliIndex.git
+	branch = xindex
+[submodule "src/competitor/sali/src"]
+	path = src/competitor/sali/src
+	url = https://github.com/WHIndex/ToliIndex.git
+	branch = sali
+[submodule "src/competitor/masstree/src"]
+	path = src/competitor/masstree/src
+	url = https://github.com/WHIndex/ToliIndex.git
+	branch = masstree
+[submodule "src/competitor/lippolc/src"]
+	path = src/competitor/lippolc/src
+	url = https://github.com/WHIndex/ToliIndex.git
+	branch = lippolc
+[submodule "src/competitor/rs/src"]
+	path = src/competitor/rs/src
+	url = https://github.com/WHIndex/ToliIndex.git
+	branch = rs
