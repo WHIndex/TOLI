@@ -1,31 +1,40 @@
-# GRE
-GRE is a benchmark suite for learned indexes and traditional indexes to measure throughput and latency with custom workload (read / write ratio) and any dataset. GRE quantifies datasets using local and global hardness, and includes a synthetic data generator to generate data with various hardness.
+# Toli
 
-See details in our VLDB 2022 paper below. If you use our work, please cite:
-```
-Chaichon Wongkham, Baotong Lu, Chris Liu, Zhicong Zhong, Eric Lo, and Tianzheng Wang. Are Updatable Learned Indexes Ready?. PVLDB, 15(11): 3004 - 3017, 2022.
-```
+Toli is a comprehensive benchmarking suite designed to evaluate the performance of learned and traditional indexes. It focuses on throughput/latency and size under various workloads, allowing you to configure the read/write ratio and test with datasets of different characteristics.
 
-## Requirements
-- gcc 8.3.0+
-- cmake 3.14.0+
+## Prerequisites
 
-## Dependencies
-- intel-mkl 2018.4.274
-- intel-tbb 2020.3
+To build and use Toli, ensure your system meets the following requirements:
+
+- **GCC** 8.3.0 or later
+- **CMake** 3.14.0 or later
+
+### Required Dependencies
+
+- Intel MKL (2018.4.274)
+- Intel TBB (2020.3)
 - jemalloc
 
-## Build
-```
-git submodule update --init # only for the first time
-mkdir -p build
-cd build
-cmake -DCMAKE_BUILD_TYPE=Release .. && make
-```
+## Build Instructions
 
-## Basic usage
-To calculate throughput:
-```
+1. Create and navigate to the build directory:
+
+   ```bash
+   mkdir -p build
+   cd build
+   ```
+
+2. Configure and build the project:
+
+   ```bash
+   cmake -DCMAKE_BUILD_TYPE=Release .. && make
+   ```
+
+## Quick Start
+
+To begin benchmarking with Toli, you can calculate throughput using the following command:
+
+```bash
 ./build/microbench \
 --keys_file=./data/dataset \
 --keys_file_type={binary,text} \
@@ -36,32 +45,62 @@ To calculate throughput:
 --thread_num=24 \
 --index=index_name \
 ```
-table_size=-1 is to infer from the first line of the file.
-init_table_ratio is to specify the proportion of the dataset to bulkload.
 
-For additional features, add additional flags:
-- Latency
-```
---latency_sample --latency_sample_ratio=0.01
-```
-- Range query (eg. range = 100)
-```
---scan_ratio=1 --scan_num=100
-```
-- To use Zipfian distribution for lookup
-```
---sample_distribution=zipf
-```
-- To perform data-shift experiment. Note that the key file needs to be generated like so (changing from one dataset to another). This flag just simply prevent the keys be shuffled and preserving the order in the key file
-```
---data_shift
-```
-- Calculate data hardness (PLA-metric) with specified model error bound of the input dataset
-```
---dataset_statistic --error_bound=32
-```
-- If the index implement memory consumption interface
-```
---memory
-```
-All the result will be output to the csv file specified in --output_path flag.
+### Explanation of Arguments:
+
+- `--keys_file`: Path to the dataset (can be binary or text format).
+- `--keys_file_type`: Specify the dataset type (`binary` or `text`).
+- `--read`: Read operation ratio (e.g., `0.5` for 50% reads).
+- `--insert`: Insert operation ratio (e.g., `0.5` for 50% inserts).
+- `--operations_num`: Total number of operations to run.
+- `--table_size`: Set the table size (set to `-1` to infer from the dataset).
+- `--init_table_ratio`: Ratio of the dataset to pre-load into the index at the start.
+- `--thread_num`: Number of threads to use for benchmarking.
+- `--index`: The index to test (specify the index name).
+
+### Additional Options:
+
+- **Latency Measurement**:  
+   To collect latency samples, use the `--latency_sample` flag:
+
+   ```bash
+   --latency_sample --latency_sample_ratio=0.01
+   ```
+
+- **Range Queries**:  
+   If you'd like to test range queries (e.g., scanning 100 entries), use:
+
+   ```bash
+   --scan_ratio=1 --scan_num=100
+   ```
+
+- **Zipfian Distribution**:  
+   To perform lookups with a Zipfian distribution:
+
+   ```bash
+   --sample_distribution=zipf
+   ```
+
+- **Data Shift Experiment**:  
+   To preserve the original order in the dataset (no shuffling of keys), enable data-shift mode:
+
+   ```bash
+   --data_shift
+   ```
+
+- **Dataset Statistics**:  
+   To calculate dataset hardness using the PLA-metric with an error bound, use:
+
+   ```bash
+   --dataset_statistic --error_bound=32
+   ```
+
+- **Memory Consumption Measurement**:  
+   If your index supports memory consumption tracking, you can enable it with:
+
+   ```bash
+   --memory
+   ```
+
+All results will be saved in a CSV file, the location of which is specified via the `--output_path` flag.
+
