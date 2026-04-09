@@ -10,6 +10,22 @@
 #include <string.h>
 #include <tbb/tbb.h>
 
+#ifndef ART_MAX_PREFIX_LEN
+#define ART_MAX_PREFIX_LEN 10  // 默认
+#endif
+
+#ifndef NODE4_MAX
+#define NODE4_MAX   4
+#endif
+
+#ifndef NODE16_MAX
+#define NODE16_MAX   16
+#endif
+
+#ifndef NODE48_MAX
+#define NODE48_MAX   48
+#endif
+
 using TID = uint64_t;
 
 namespace ART_unsynchronized {
@@ -27,7 +43,7 @@ namespace ART_unsynchronized {
         N256 = 3
     };
 
-    static constexpr uint32_t maxStoredPrefixLength = 10;
+    static constexpr uint32_t maxStoredPrefixLength = ART_MAX_PREFIX_LEN;
 
     using Prefix = uint8_t[maxStoredPrefixLength];
 
@@ -112,8 +128,9 @@ namespace ART_unsynchronized {
     public:
         //TODO
         //atomic??
-        uint8_t keys[4];
-        N *children[4] = {nullptr, nullptr, nullptr, nullptr};
+        uint8_t keys[NODE4_MAX];
+        // N *children[NODE4_MAX] = {nullptr, nullptr, nullptr, nullptr};
+        N *children[NODE4_MAX] = {};
 
     public:
         N4(const uint8_t *prefix, uint32_t prefixLength) : N(NTypes::N4, prefix,
@@ -146,8 +163,8 @@ namespace ART_unsynchronized {
 
     class N16 : public N {
     public:
-        uint8_t keys[16];
-        N *children[16];
+        uint8_t keys[NODE16_MAX];
+        N *children[NODE16_MAX];
 
         static uint8_t flipSign(uint8_t keyByte) {
             // Flip the sign bit, enables signed SSE comparison of unsigned values, used by Node16
@@ -202,9 +219,9 @@ namespace ART_unsynchronized {
 
     class N48 : public N {
         uint8_t childIndex[256];
-        N *children[48];
+        N *children[NODE48_MAX];
     public:
-        static const uint8_t emptyMarker = 48;
+        static const uint8_t emptyMarker = NODE48_MAX;
 
         N48(const uint8_t *prefix, uint32_t prefixLength) : N(NTypes::N48, prefix,
                                                                               prefixLength) {

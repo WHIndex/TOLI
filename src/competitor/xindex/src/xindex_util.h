@@ -34,7 +34,11 @@ namespace xindex {
 
 static const size_t desired_training_key_n = 10000000;
 static const size_t max_model_n = 4;
-static const size_t seq_insert_reserve_factor = 2;
+// static const size_t seq_insert_reserve_factor = 2;
+#ifndef SEQ_INSERT_RESERVE_FACTOR
+  #define SEQ_INSERT_RESERVE_FACTOR 2
+  #endif
+  size_t seq_insert_reserve_factor = SEQ_INSERT_RESERVE_FACTOR;
 
 struct alignas(CACHELINE_SIZE) RCUStatus;
 enum class Result;
@@ -60,16 +64,57 @@ struct alignas(CACHELINE_SIZE) BGInfo {
   std::atomic<bool> finished;
   volatile bool running;
 };
+// struct IndexConfig {
+//   // double root_error_bound = 32;
+//   double root_error_bound = 64;
+//   double root_memory_constraint = 1024 * 1024;
+//   // double group_error_bound = 32;
+//   double group_error_bound = 64;
+//   double group_error_tolerance = 4;
+//   size_t buffer_size_bound = 256;
+//   double buffer_size_tolerance = 3;
+//   size_t buffer_compact_threshold = 8;
+//   size_t worker_n = 0;
+//   std::unique_ptr<rcu_status_t[]> rcu_status;
+//   volatile bool exited = false;
+// };
+
 struct IndexConfig {
-  // double root_error_bound = 32;
-  double root_error_bound = 64;
-  double root_memory_constraint = 1024 * 1024;
-  // double group_error_bound = 32;
-  double group_error_bound = 64;
-  double group_error_tolerance = 4;
-  size_t buffer_size_bound = 256;
-  double buffer_size_tolerance = 3;
-  size_t buffer_compact_threshold = 8;
+  #ifndef ROOT_ERROR_BOUND
+  #define ROOT_ERROR_BOUND 64
+  #endif
+  double root_error_bound = ROOT_ERROR_BOUND;
+
+  #ifndef ROOT_MEMORY_CONSTRAINT
+  #define ROOT_MEMORY_CONSTRAINT (1024 * 1024)
+  #endif
+  double root_memory_constraint = ROOT_MEMORY_CONSTRAINT;
+
+  #ifndef GROUP_ERROR_BOUND
+  #define GROUP_ERROR_BOUND 64
+  #endif
+  double group_error_bound = GROUP_ERROR_BOUND;
+
+  #ifndef GROUP_ERROR_TOLERANCE
+  #define GROUP_ERROR_TOLERANCE 4
+  #endif
+  double group_error_tolerance = GROUP_ERROR_TOLERANCE;
+
+  #ifndef BUFFER_SIZE_BOUND
+  #define BUFFER_SIZE_BOUND 256
+  #endif
+  size_t buffer_size_bound = BUFFER_SIZE_BOUND;
+
+  #ifndef BUFFER_SIZE_TOLERANCE
+  #define BUFFER_SIZE_TOLERANCE 3
+  #endif
+  double buffer_size_tolerance = BUFFER_SIZE_TOLERANCE;
+
+  #ifndef BUFFER_COMPACT_THRESHOLD
+  #define BUFFER_COMPACT_THRESHOLD 8
+  #endif
+  size_t buffer_compact_threshold = BUFFER_COMPACT_THRESHOLD;
+
   size_t worker_n = 0;
   std::unique_ptr<rcu_status_t[]> rcu_status;
   volatile bool exited = false;

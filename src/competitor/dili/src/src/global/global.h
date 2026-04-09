@@ -28,10 +28,14 @@ extern const double R2;
 extern const double R3;
 
 //extern const int minFan;
-extern const int fanThreashold;
+// extern const int fanThreashold;
 
-#define LEAF_MAX_CAPACIY 8192
+// #define LEAF_MAX_CAPACIY 8192
 #define minFan 2
+
+#ifndef LEAF_MAX_CAPACIY
+#define LEAF_MAX_CAPACIY 8192
+#endif
 
 #define MIN_KEY(a, b) std::min<keyType>(a, b)
 
@@ -43,8 +47,8 @@ extern const int fanThreashold;
 //extern const int minFanforSplit;
 
 
-extern double RHO;
-extern int buMinFan;
+// extern double RHO;
+// extern int buMinFan;
 extern double max_expanding_ratio;
 extern double retrain_threshold;
 

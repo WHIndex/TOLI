@@ -423,6 +423,38 @@ unsigned long long Group<key_t, val_t, seq, max_model_n>::size() const {
   return size;
 }
 
+// template <class key_t, class val_t, bool seq, size_t max_model_n>
+// unsigned long long Group<key_t, val_t, seq, max_model_n>::size() const {
+//     unsigned long long data_array_bytes = sizeof(record_t) * capacity;   // 带 gaps 的真实 data array 大小
+//     unsigned long long buffer_bytes = 0;
+//     int num_buffers = 0;
+
+//     if (buffer) {
+//         buffer_bytes += buffer->size_in_byte();
+//         num_buffers++;
+//     }
+//     if (buffer_temp) {
+//         buffer_bytes += buffer_temp->size_in_byte();
+//         num_buffers++;
+//     }
+
+//     unsigned long long total_size = sizeof(*this) + data_array_bytes + buffer_bytes;
+
+//     // 打印你想要的所有信息（清晰带标签）
+//     double data_array_gb = data_array_bytes / (1024.0 * 1024 * 1024);
+//     double buffer_gb = buffer_bytes / (1024.0 * 1024 * 1024);
+
+//     printf("[Group] Buffers: %d   |   Real Data (array_size): %zu\n", 
+//            num_buffers, array_size);
+//     printf("[Group] Data Array (with gaps): %llu bytes (%.6f GB)   capacity = %zu\n", 
+//            data_array_bytes, data_array_gb, capacity);
+//     printf("[Group] Buffer (buffer + buffer_temp): %llu bytes (%.6f GB)\n", 
+//            buffer_bytes, buffer_gb);
+//     printf("--------------------------------------------------\n");   // 分隔线，便于看很多 Group
+
+//     return total_size;
+// }
+
 template <class key_t, class val_t, bool seq, size_t max_model_n>
 inline size_t Group<key_t, val_t, seq, max_model_n>::locate_model(
     const key_t &key) {

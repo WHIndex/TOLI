@@ -7,12 +7,12 @@ namespace ART_unsynchronized {
     const uint8_t N16_shrink = 3;
 
     bool N16::insert(uint8_t key, N *n) {
-        if (count == 16) {
+        if (count == NODE16_MAX) {
             return false;
         }
         uint8_t keyByteFlipped = flipSign(key);
         __m128i cmp = _mm_cmplt_epi8(_mm_set1_epi8(keyByteFlipped), _mm_loadu_si128(reinterpret_cast<__m128i *>(keys)));
-        uint16_t bitfield = _mm_movemask_epi8(cmp) & (0xFFFF >> (16 - count));
+        uint16_t bitfield = _mm_movemask_epi8(cmp) & (0xFFFF >> (NODE16_MAX - count));
         unsigned pos = bitfield ? ctz(bitfield) : count;
         memmove(keys + pos + 1, keys + pos, count - pos);
         memmove(children + pos + 1, children + pos, (count - pos) * sizeof(uintptr_t));
@@ -117,7 +117,7 @@ namespace ART_unsynchronized {
 
     long N16::size() {
         long size = 0;
-        for(int i = 0; i < 16; i++) {
+        for(int i = 0; i < NODE16_MAX; i++) {
             size += N::size(children[i]);
             size += sizeof(children[i]);
             size += sizeof(keys[i]);

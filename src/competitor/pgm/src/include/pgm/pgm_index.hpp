@@ -63,7 +63,16 @@ struct ApproxPos {
  * @tparam EpsilonRecursive controls the size of the search range in the internal structure
  * @tparam Floating the floating-point type to use for slopes
  */
-template<typename K, size_t Epsilon = 64, size_t EpsilonRecursive = 4, typename Floating = float>
+
+ #ifndef PGM_EPSILON
+ #define PGM_EPSILON 64  // 默认主误差界限
+ #endif
+ 
+ #ifndef PGM_EPSILON_RECURSIVE
+ #define PGM_EPSILON_RECURSIVE 4  // 默认递归误差（可选枚举）
+ #endif
+
+template<typename K, size_t Epsilon = PGM_EPSILON, size_t EpsilonRecursive = PGM_EPSILON_RECURSIVE, typename Floating = float>
 class PGMIndex {
 protected:
     template<typename, size_t, size_t, uint8_t, typename>

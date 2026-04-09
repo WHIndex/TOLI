@@ -7,11 +7,15 @@
 #include "aidel_model_impl.h"
 #include "piecewise_linear_model.h"
 
+#ifndef FINEDEX_MAX_ERR
+#define FINEDEX_MAX_ERR 64  // 默认 maxErr
+#endif
+
 namespace aidel {
 
 template<class key_t, class val_t>
 inline AIDEL<key_t, val_t>::AIDEL()
-    : maxErr(64), learning_step(1000), learning_rate(0.1)
+    : maxErr(FINEDEX_MAX_ERR), learning_step(1000), learning_rate(0.1)
 {
     //root = new root_type();
 }

@@ -64,6 +64,7 @@ size_t AidelModel<key_t, val_t>::size() const{
         if (mobs[i]){
             if(mobs[i]->isbin){
                 size += mobs[i]->mob.lb->size();
+                // size += 0;
             }else {
                 size += mobs[i]->mob.ai->size();
             }

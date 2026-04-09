@@ -101,19 +101,35 @@ public:
     /// printable.
     static const bool debug = false;
 
-    /// Number of slots in each leaf of the tree. Estimated so that each node
-    /// has a size of about 256 bytes.
-    static const int leafslots = BTREE_MAX(8, 256 / (sizeof(_Key)));
+    // /// Number of slots in each leaf of the tree. Estimated so that each node
+    // /// has a size of about 256 bytes.
+    // static const int leafslots = BTREE_MAX(8, 256 / (sizeof(_Key)));
+    // // static const int leafslots = 1024;
 
-    /// Number of slots in each inner node of the tree. Estimated so that each node
-    /// has a size of about 256 bytes.
-    static const int innerslots = BTREE_MAX(8, 256 / (sizeof(_Key) + sizeof(void*)));
+    // /// Number of slots in each inner node of the tree. Estimated so that each node
+    // /// has a size of about 256 bytes.
+    // static const int innerslots = BTREE_MAX(8, 256 / (sizeof(_Key) + sizeof(void*)));
 
-    /// As of stx-btree-0.9, the code does linear search in find_lower() and
-    /// find_upper() instead of binary_search, unless the node size is larger
-    /// than this threshold. See notes at
-    /// http://panthema.net/2013/0504-STX-B+Tree-Binary-vs-Linear-Search
-    static const size_t binsearch_threshold = 256;
+    // /// As of stx-btree-0.9, the code does linear search in find_lower() and
+    // /// find_upper() instead of binary_search, unless the node size is larger
+    // /// than this threshold. See notes at
+    // /// http://panthema.net/2013/0504-STX-B+Tree-Binary-vs-Linear-Search
+    // static const size_t binsearch_threshold = 256;
+
+    #ifndef BTREE_LEAF_SLOTS
+    #define BTREE_LEAF_SLOTS 8
+    #endif
+        static const int leafslots = BTREE_LEAF_SLOTS;
+    
+    #ifndef BTREE_INNER_SLOTS
+    #define BTREE_INNER_SLOTS 8
+    #endif
+        static const int innerslots = BTREE_INNER_SLOTS;
+    
+    #ifndef BTREE_BINSEARCH_THRESHOLD
+    #define BTREE_BINSEARCH_THRESHOLD 256
+    #endif
+        static const size_t binsearch_threshold = BTREE_BINSEARCH_THRESHOLD;  // 用宏替换
 };
 
 /** Generates default traits for a B+ tree used as a map. It estimates leaf and
@@ -132,19 +148,34 @@ public:
     /// printable.
     static const bool debug = false;
 
-    /// Number of slots in each leaf of the tree. Estimated so that each node
-    /// has a size of about 256 bytes.
-    static const int leafslots = BTREE_MAX(8, 256 / (sizeof(_Key) + sizeof(_Data)));
+    // /// Number of slots in each leaf of the tree. Estimated so that each node
+    // /// has a size of about 256 bytes.
+    // static const int leafslots = BTREE_MAX(8, 256 / (sizeof(_Key) + sizeof(_Data)));
 
-    /// Number of slots in each inner node of the tree. Estimated so that each node
-    /// has a size of about 256 bytes.
-    static const int innerslots = BTREE_MAX(8, 256 / (sizeof(_Key) + sizeof(void*)));
+    // /// Number of slots in each inner node of the tree. Estimated so that each node
+    // /// has a size of about 256 bytes.
+    // static const int innerslots = BTREE_MAX(8, 256 / (sizeof(_Key) + sizeof(void*)));
 
-    /// As of stx-btree-0.9, the code does linear search in find_lower() and
-    /// find_upper() instead of binary_search, unless the node size is larger
-    /// than this threshold. See notes at
-    /// http://panthema.net/2013/0504-STX-B+Tree-Binary-vs-Linear-Search
-    static const size_t binsearch_threshold = 256;
+    // /// As of stx-btree-0.9, the code does linear search in find_lower() and
+    // /// find_upper() instead of binary_search, unless the node size is larger
+    // /// than this threshold. See notes at
+    // /// http://panthema.net/2013/0504-STX-B+Tree-Binary-vs-Linear-Search
+    // static const size_t binsearch_threshold = 256;
+
+    #ifndef BTREE_LEAF_SLOTS
+    #define BTREE_LEAF_SLOTS 8
+    #endif
+        static const int leafslots = BTREE_LEAF_SLOTS;
+    
+    #ifndef BTREE_INNER_SLOTS
+    #define BTREE_INNER_SLOTS 8
+    #endif
+        static const int innerslots = BTREE_INNER_SLOTS;
+    
+    #ifndef BTREE_BINSEARCH_THRESHOLD
+    #define BTREE_BINSEARCH_THRESHOLD 256
+    #endif
+        static const size_t binsearch_threshold = BTREE_BINSEARCH_THRESHOLD;  // 用宏替换
 };
 
 /** @brief Basic class implementing a base B+ tree data structure in memory.
@@ -236,15 +267,19 @@ public:
     /// this can differ from slots in each leaf.
     static const unsigned short innerslotmax = traits::innerslots;
 
+    #ifndef BTREE_MIN_FACTOR
+    #define BTREE_MIN_FACTOR 2
+    #endif
+
     /// Computed B+ tree parameter: The minimum number of key/data slots used
     /// in a leaf. If fewer slots are used, the leaf will be merged or slots
     /// shifted from it's siblings.
-    static const unsigned short minleafslots = (leafslotmax / 2);
+    static const unsigned short minleafslots = (leafslotmax / BTREE_MIN_FACTOR);
 
     /// Computed B+ tree parameter: The minimum number of key slots used
     /// in an inner node. If fewer slots are used, the inner node will be
     /// merged or slots shifted from it's siblings.
-    static const unsigned short mininnerslots = (innerslotmax / 2);
+    static const unsigned short mininnerslots = (innerslotmax / BTREE_MIN_FACTOR);
 
     /// Debug parameter: Enables expensive and thorough checking of the B+ tree
     /// invariants after each insert/erase operation.
@@ -2521,6 +2556,18 @@ public:
         }
 
         BTREE_ASSERT(it == iend && num_items == 0);
+
+        // leaf_node* current = m_headleaf;
+        // size_t leaf_index = 0;
+        // while (current) {
+        //     if (current->slotuse > 0) {
+        //         const key_type& min_key = current->slotkey[0];
+        //         const key_type& max_key = current->slotkey[current->slotuse - 1];
+        //         std::cout << "Leaf " << leaf_index << ": min = " << min_key << ", max = " << max_key << std::endl;
+        //     }
+        //     current = current->nextleaf;
+        //     ++leaf_index;
+        // }
 
         // if the btree is so small to fit into one leaf, then we're done.
         if (m_headleaf == m_tailleaf) {

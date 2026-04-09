@@ -38,7 +38,16 @@ namespace pgm {
  * @tparam V the type of a value
  * @tparam PGMType the type of @ref PGMIndex to use in the container
  */
-template<typename K, typename V, typename PGMType = PGMIndex<K, 16>>
+
+ #ifndef PGM_EPSILON
+ #define PGM_EPSILON 64  // 默认主误差界限
+ #endif
+ 
+ #ifndef PGM_EPSILON_RECURSIVE
+ #define PGM_EPSILON_RECURSIVE 4  // 默认递归误差（可选枚举）
+ #endif
+
+template<typename K, typename V, typename PGMType = PGMIndex<K, PGM_EPSILON>>
 class DynamicPGMIndex {
     class ItemA;
     class ItemB;

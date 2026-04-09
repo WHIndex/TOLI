@@ -5,7 +5,7 @@
 namespace ART_OLC {
 
     bool N48::isFull() const {
-        return count == 48;
+        return count == NODE48_MAX;
     }
 
     bool N48::isUnderfull() const {
@@ -96,7 +96,7 @@ namespace ART_OLC {
 
     long long N48::size() {
         long long size = 0;
-        for(int i = 0; i < 48; i++) {
+        for(int i = 0; i < NODE48_MAX; i++) {
             size += N::size(children[i]);
             size += sizeof(children[i]);
         }

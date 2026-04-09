@@ -90,12 +90,36 @@ class SALI {
     static_assert(std::is_arithmetic<T>::value,
     "SALI key type must be numeric.");
 
-    inline double compute_gap_count(int size) {
-      if (size >= 1000000)
-        return 1;
-      if (size >= 100000)
-        return 2;
-      return 5;
+    // inline double compute_gap_count(int size) {
+    //   if (size >= 1000000)
+    //     return 1;
+    //   if (size >= 100000)
+    //     return 2;
+    //   return 5;
+    // }
+    // SALI gap count 配置（可通过 CMake -D 覆盖）
+    #ifndef SALI_THRESHOLD1
+    #define SALI_THRESHOLD1 1000000     // 默认 1M
+    #endif
+    #ifndef SALI_GAP1
+    #define SALI_GAP1 1
+    #endif
+
+    #ifndef SALI_THRESHOLD2
+    #define SALI_THRESHOLD2 100000      // 默认 100K
+    #endif
+    #ifndef SALI_GAP2
+    #define SALI_GAP2 2
+    #endif
+
+    #ifndef SALI_DEFAULT_GAP
+    #define SALI_DEFAULT_GAP 5
+    #endif
+
+    inline int compute_gap_count(int size) {
+        if (size >= SALI_THRESHOLD1) return SALI_GAP1;
+        if (size >= SALI_THRESHOLD2) return SALI_GAP2;
+        return SALI_DEFAULT_GAP;
     }
 
     inline double compute_max_ratio(int size) {

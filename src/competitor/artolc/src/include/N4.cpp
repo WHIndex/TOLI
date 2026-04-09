@@ -12,7 +12,7 @@ namespace ART_OLC {
     }
 
     bool N4::isFull() const {
-        return count == 4;
+        return count == NODE4_MAX;
     }
 
     bool N4::isUnderfull() const {
@@ -109,7 +109,7 @@ namespace ART_OLC {
 
     long long N4::size() {
         long long size = 0;
-        for(int i = 0; i < 4; i++) {
+        for(int i = 0; i < NODE4_MAX; i++) {
             size += N::size(children[i]);
             size += sizeof(children[i]);
             size += sizeof(keys[i]);

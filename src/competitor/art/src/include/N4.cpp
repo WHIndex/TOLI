@@ -5,7 +5,7 @@
 namespace ART_unsynchronized {
 
     void N4::deleteChildren() {
-        for (uint32_t i = 0; i < 4; ++i) {
+        for (uint32_t i = 0; i < NODE4_MAX; ++i) {
             if (children[i] != nullptr) {
                 N::deleteChildren(children[i]);
                 N::deleteNode(children[i]);
@@ -14,10 +14,10 @@ namespace ART_unsynchronized {
     }
 
     bool N4::insert(uint8_t key, N *n) {
-        if (count == 4) {
+        if (count == NODE4_MAX) {
             return false;
         }
-        for (uint32_t i = 0; i < 4; ++i) {
+        for (uint32_t i = 0; i < NODE4_MAX; ++i) {
             if (children[i] == nullptr) {
                 keys[i] = key;
                 children[i] = n;
@@ -31,13 +31,13 @@ namespace ART_unsynchronized {
 
     template<class NODE>
     void N4::copyTo(NODE *n) const {
-        for (uint32_t i = 0; i < 4; ++i) {
+        for (uint32_t i = 0; i < NODE4_MAX; ++i) {
             n->insert(keys[i], children[i]);
         }
     }
 
     void N4::change(uint8_t key, N *val) {
-        for (uint32_t i = 0; i < 4; ++i) {
+        for (uint32_t i = 0; i < NODE4_MAX; ++i) {
             if (children[i] != nullptr && keys[i] == key) {
                 children[i] = val;
                 return;
@@ -46,7 +46,7 @@ namespace ART_unsynchronized {
     }
 
     N *N4::getChild(const uint8_t k) const {
-        for (uint32_t i = 0; i < 4; ++i) {
+        for (uint32_t i = 0; i < NODE4_MAX; ++i) {
             if (children[i] != nullptr && keys[i] == k) {
                 return children[i];
             }
@@ -59,7 +59,7 @@ namespace ART_unsynchronized {
     }
 
     bool N4::remove(uint8_t k, bool /*force*/) {
-        for (uint32_t i = 0; i < 4; ++i) {
+        for (uint32_t i = 0; i < NODE4_MAX; ++i) {
             if (children[i] != nullptr && keys[i] == k) {
                 count--;
                 children[i] = nullptr;
@@ -72,7 +72,7 @@ namespace ART_unsynchronized {
 
     N *N4::getAnyChild() const {
         N *anyChild;
-        for (uint32_t i = 0; i < 4; ++i) {
+        for (uint32_t i = 0; i < NODE4_MAX; ++i) {
             if (children[i] != nullptr) {
                 if (N::isLeaf(children[i])) {
                     return children[i];
@@ -85,7 +85,7 @@ namespace ART_unsynchronized {
     }
 
     std::tuple<N *, uint8_t> N4::getSecondChild(const uint8_t key) const {
-        for (uint32_t i = 0; i < 4; ++i) {
+        for (uint32_t i = 0; i < NODE4_MAX; ++i) {
             if (children[i] != nullptr && keys[i] != key) {
                 return std::make_tuple(children[i], keys[i]);
             }
@@ -98,7 +98,7 @@ namespace ART_unsynchronized {
                          uint32_t &childrenCount) const{
 //TODO lock
         childrenCount = 0;
-        for (uint32_t i = 0; i < 4; ++i) {
+        for (uint32_t i = 0; i < NODE4_MAX; ++i) {
             if (this->children[i] != nullptr && this->keys[i] >= start && this->keys[i] <= end) {
                 children[childrenCount] = std::make_tuple(this->keys[i], this->children[i]);
                 childrenCount++;
@@ -111,7 +111,7 @@ namespace ART_unsynchronized {
 
     long N4::size() {
         long size = 0;
-        for(int i = 0; i < 4; i++) {
+        for(int i = 0; i < NODE4_MAX; i++) {
             size += N::size(children[i]);
             size += sizeof(children[i]);
             size += sizeof(keys[i]);

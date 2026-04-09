@@ -7,7 +7,7 @@
 namespace ART_OLC {
 
     bool N16::isFull() const {
-        return count == 16;
+        return count == NODE16_MAX;
     }
 
     bool N16::isUnderfull() const {
@@ -17,7 +17,7 @@ namespace ART_OLC {
     void N16::insert(uint8_t key, N *n) {
         uint8_t keyByteFlipped = flipSign(key);
         __m128i cmp = _mm_cmplt_epi8(_mm_set1_epi8(keyByteFlipped), _mm_loadu_si128(reinterpret_cast<__m128i *>(keys)));
-        uint16_t bitfield = _mm_movemask_epi8(cmp) & (0xFFFF >> (16 - count));
+        uint16_t bitfield = _mm_movemask_epi8(cmp) & (0xFFFF >> (NODE16_MAX - count));
         unsigned pos = bitfield ? ctz(bitfield) : count;
         memmove(keys + pos + 1, keys + pos, count - pos);
         memmove(children + pos + 1, children + pos, (count - pos) * sizeof(uintptr_t));
@@ -113,7 +113,7 @@ namespace ART_OLC {
 
     long long N16::size() {
         long long size = 0;
-        for(int i = 0; i < 16; i++) {
+        for(int i = 0; i < NODE16_MAX; i++) {
             size += N::size(children[i]);
             size += sizeof(children[i]);
             size += sizeof(keys[i]);

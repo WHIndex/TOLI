@@ -70,12 +70,36 @@ typedef void (*dealloc_func)(void *ptr);
 template <class T, class P, bool USE_FMCD = true> class LIPP {
   static_assert(std::is_arithmetic<T>::value, "LIPP key type must be numeric.");
 
+  // inline int compute_gap_count(int size) {
+  //   if (size >= 1000000)
+  //     return 1;
+  //   if (size >= 100000)
+  //     return 2;
+  //   return 5;
+  // }
+
+  #ifndef LIPP_THRESHOLD1
+  #define LIPP_THRESHOLD1 1000000     // 默认 1M
+  #endif
+  #ifndef LIPP_GAP1
+  #define LIPP_GAP1 1
+  #endif
+
+  #ifndef LIPP_THRESHOLD2
+  #define LIPP_THRESHOLD2 100000      // 默认 100K
+  #endif
+  #ifndef LIPP_GAP2
+  #define LIPP_GAP2 2
+  #endif
+
+  #ifndef LIPP_DEFAULT_GAP
+  #define LIPP_DEFAULT_GAP 5
+  #endif
+
   inline int compute_gap_count(int size) {
-    if (size >= 1000000)
-      return 1;
-    if (size >= 100000)
-      return 2;
-    return 5;
+      if (size >= LIPP_THRESHOLD1) return LIPP_GAP1;
+      if (size >= LIPP_THRESHOLD2) return LIPP_GAP2;
+      return LIPP_DEFAULT_GAP;
   }
 
   struct Node;

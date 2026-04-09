@@ -4,6 +4,10 @@
 #include "./src/include/aidel_impl.h"
 #include"../indexInterface.h"
 
+#ifndef FINEDEX_MAX_ERR
+#define FINEDEX_MAX_ERR 64  // 默认 maxErr
+#endif
+
 template<class KEY_TYPE, class PAYLOAD_TYPE>
 class finedexInterface final : public indexInterface<KEY_TYPE, PAYLOAD_TYPE> {
 public:
@@ -47,7 +51,7 @@ void finedexInterface<KEY_TYPE, PAYLOAD_TYPE>::bulk_load(std::pair <KEY_TYPE, PA
   }
   // index.train(key_temp, val_temp, 32);
   std::cout << "Bulk loading with " << key_temp.size() << " keys" << std::endl;
-  index->train(key_temp, val_temp, 32);
+  index->train(key_temp, val_temp, FINEDEX_MAX_ERR);
 }
 
 template<class KEY_TYPE, class PAYLOAD_TYPE>

@@ -68,6 +68,12 @@ template <typename KEY_TYPE, typename PAYLOAD_TYPE> class Benchmark {
   bool memory_record;
   bool dataset_statistic;
   bool data_shift = false;
+
+  // buckindex parameters
+  double bli_initial_filled_ratio = 0.5;
+  size_t bli_sbuck_size = 8;
+  size_t bli_dbuck_size = 256;
+
   int test_suite = 0;
   int preload_suite = 0;
   std::string partition_method;
@@ -3287,14 +3293,19 @@ public:
   }
 
   inline void prepare(index_t *&index, const KEY_TYPE *keys) {
-    index = get_index<KEY_TYPE, PAYLOAD_TYPE>(index_type, partition_method,
-                                              partition_num);
-
-    // initilize Index (sort keys first)
-    // std::string dataset_name= keys_file_path last part
     std::string dataset_name =
         keys_file_path.substr(keys_file_path.find_last_of("/") + 1);
-    Param param = Param(thread_num, 0, keys, dataset_name, index_type);
+    Param param = Param(thread_num, 0, 
+            bli_initial_filled_ratio,
+            bli_sbuck_size, bli_dbuck_size, error_bound, keys, dataset_name, index_type);
+    index = get_index<KEY_TYPE, PAYLOAD_TYPE>(index_type, partition_method,
+                                              partition_num, &param);
+
+    // // initilize Index (sort keys first)
+    // // std::string dataset_name= keys_file_path last part
+    // std::string dataset_name =
+    //     keys_file_path.substr(keys_file_path.find_last_of("/") + 1);
+    // // Param param = Param(thread_num, 0, keys, dataset_name, index_type);
     index->init(&param);
 
     if (dump_bulkload) {
@@ -3388,6 +3399,11 @@ public:
     memory_record = get_boolean_flag(flags, "memory");
     dataset_statistic = get_boolean_flag(flags, "dataset_statistic");
     data_shift = get_boolean_flag(flags, "data_shift");
+
+    bli_initial_filled_ratio = stod(get_with_default(flags, "bli_initial_filled_ratio", "0.5"));
+    bli_sbuck_size = stoi(get_with_default(flags, "bli_sbuck_size", "8"));
+    bli_dbuck_size = stoi(get_with_default(flags, "bli_dbuck_size", "256"));
+
     test_suite = stoi(get_with_default(flags, "test_suite", "0"));
     dump_bulkload = get_boolean_flag(flags, "dump_bulkload");
     sigma_ratio = stod(get_with_default(flags, "sigma_ratio", "0.5"));
@@ -3496,7 +3512,10 @@ public:
     {
       // thread specifier
       auto thread_id = omp_get_thread_num();
-      auto paramI = Param(thread_num, thread_id);
+      // auto paramI = Param(thread_num, thread_id);
+      auto paramI = Param(thread_num, thread_id,
+        bli_initial_filled_ratio,
+        0, 0, 0);
       // Latency Sample Variable
       int latency_sample_interval =
           operations_num / (operations_num * latency_sample_ratio);
@@ -3722,7 +3741,72 @@ public:
       ofile << "partition_num"
                ",";
       ofile << "operations_num"
-               ","
+               ",";
+      ofile << "alex_max_density"
+               ",";
+      ofile << "alex_init_density"
+               ",";
+      ofile << "alex_min_density"
+                ",";
+      ofile << "xindex_root_error"
+               ",";
+      ofile << "xindex_group_error"
+                ",";
+      ofile << "xindex_buffer_size"
+                ",";
+      ofile << "xindex_seq_insert_reserve_factor"
+                ",";
+      ofile << "lipp_threshold1"
+                ",";
+      ofile << "lipp_gap1"
+               ",";
+      ofile << "lipp_threshold2"
+                ",";
+      ofile << "lipp_gap2"
+                ",";
+      ofile << "lipp_default_gap"
+                ",";
+      ofile << "sali_threshold1"
+                ",";
+      ofile << "sali_gap1"
+               ",";
+      ofile << "sali_threshold2"
+                ",";
+      ofile << "sali_gap2"
+                ",";
+      ofile << "sali_default_gap"
+                ",";
+      ofile << "pgm_epsilon"
+                ",";
+      ofile << "pgm_epsilon_recursive"
+                ",";
+      ofile << "finedex_max_err"
+                ",";
+      ofile << "art_max_prefix_len"
+                ",";
+      ofile << "art_node4max"
+                ",";
+      ofile << "art_node16max"
+                ",";
+      ofile << "art_node48max"
+                ",";
+      ofile << "btree_leaf_slots" 
+                ",";
+      ofile << "btree_inner_slots"  
+                ",";
+      ofile << "btree_binsearch_threshold"
+                ",";
+      ofile << "btree_min_factor"
+                << ",";
+      ofile << "dili_fan_threshold"
+                ",";
+      ofile << "dili_rho"
+                ",";
+      ofile << "dili_bu_min_fan"
+                ",";
+      ofile << "dili_leaf_max_capacity"
+                ",";
+      ofile << "btreeolc_pagesize"
             << std::endl;
     }
 
@@ -3777,7 +3861,88 @@ public:
     ofile << partition_method << ",";
     // ofile << partition_num << std::endl;
     ofile << partition_num << ",";
-    ofile << operations_num << std::endl;
+    ofile << operations_num << ",";
+    if (index_type == "alex" || index_type == "alexol") {
+      ofile << std::fixed << std::setprecision(2) << alex::AlexDataNode<uint64_t, uint64_t>::kMaxDensity_ << ",";
+      ofile << std::fixed << std::setprecision(2) << alex::AlexDataNode<uint64_t, uint64_t>::kInitDensity_ << ",";
+      ofile << std::fixed << std::setprecision(2) << alex::AlexDataNode<uint64_t, uint64_t>::kMinDensity_ << ",";
+    } else {
+      ofile << ","  // alex_max_density 为空
+            << ","  // alex_init_density 为空
+            << ","; // alex_min_density 为空
+    }
+    // XIndex 参数（条件输出，类似 alex）
+    if (index_type == "xindex") {
+      ofile << std::fixed << std::setprecision(2) << ROOT_ERROR_BOUND << ",";
+      ofile << std::fixed << std::setprecision(2) << GROUP_ERROR_BOUND << ",";
+      ofile << std::fixed << std::setprecision(2) << BUFFER_SIZE_BOUND << ",";
+      ofile << SEQ_INSERT_RESERVE_FACTOR << ",";          // ← 新增
+    } else {
+      ofile << "," << "," << "," << ",";  // 空字段（原来3个，现在4个）
+    }
+    // LIPP 参数（只在 --index=lipp 时输出）
+    if (index_type == "lipp" || index_type == "lippol") {
+      ofile << LIPP_THRESHOLD1 << ",";
+      ofile << LIPP_GAP1 << ",";
+      ofile << LIPP_THRESHOLD2 << ",";
+      ofile << LIPP_GAP2 << ",";
+      ofile << LIPP_DEFAULT_GAP << ",";
+    } else {
+      ofile << "," << "," << "," << "," << ",";
+    }
+    // SALI 参数（只在 --index=sali 时输出）
+    if (index_type == "sali") {
+      ofile << SALI_THRESHOLD1 << ",";
+      ofile << SALI_GAP1 << ",";
+      ofile << SALI_THRESHOLD2 << ",";
+      ofile << SALI_GAP2 << ",";
+      ofile << SALI_DEFAULT_GAP << ",";
+    } else {
+      ofile << "," << "," << "," << "," << ",";
+    }
+    // PGM 参数（条件输出）
+    if (index_type == "pgm" || index_type == "dpgm") {
+      ofile << PGM_EPSILON << ",";  // 主 Epsilon
+      ofile << PGM_EPSILON_RECURSIVE << ",";  // 递归 Epsilon
+    } else {
+      ofile << "," << ",";  // 空字段，保持列一致
+    }
+    // Finedex 参数（条件输出）
+    if (index_type == "finedex") {
+      ofile << FINEDEX_MAX_ERR << ",";  // 直接用宏值
+    } else {
+      ofile << ",";  // 空字段
+    }
+    if (index_type == "art" || index_type == "artolc") {
+      ofile << ART_MAX_PREFIX_LEN << ",";  // 输出值
+      ofile << NODE4_MAX << ",";  // 输出值
+      ofile << NODE16_MAX << ",";  // 输出值
+      ofile << NODE48_MAX << ",";  // 输出值
+    } else {
+        ofile << "," << "," << "," << ","; 
+    }
+    if (index_type == "btree" || index_type == "btreehalf") {
+      ofile << BTREE_LEAF_SLOTS << "," 
+            << BTREE_INNER_SLOTS << "," 
+            << BTREE_BINSEARCH_THRESHOLD << "," 
+            << BTREE_MIN_FACTOR << ",";
+    } else {
+        ofile << "," << "," << "," << ",";   // 保持列对齐（原来3列 → 现在4列）
+    }
+    if (index_type == "dili") {
+      ofile << DILI_FAN_THRESHOLD << ",";
+      ofile << std::fixed << std::setprecision(2) << DILI_RHO << ",";
+      ofile << DILI_BU_MIN_FAN << ",";
+      ofile << LEAF_MAX_CAPACIY << ",";
+    } else {
+      ofile << "," << "," << "," << ",";
+    }
+    if (index_type == "btreeolc") {
+      ofile << BTREEOLC_PAGESIZE << ",";
+    } else {
+      ofile << ",";   // 保持列对齐
+    }
+    ofile << std::endl;
     ofile.close();
 
     if (clear_flag)

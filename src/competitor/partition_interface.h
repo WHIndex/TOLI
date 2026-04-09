@@ -34,7 +34,7 @@
 #include <unordered_map>
 #include <vector>
 
-#define ROBIN_BOUND(a, x, b) ((x) < (a) ? (a) : ((x) > (b) ? (b) : (x)))
+#define TOLI_BOUND(a, x, b) ((x) < (a) ? (a) : ((x) > (b) ? (b) : (x)))
 
 template <class KEY_TYPE, class PAYLOAD_TYPE>
 class partitionedIndexInterface final
@@ -143,7 +143,7 @@ public:
                          std::vector<std::pair<KEY_TYPE, PAYLOAD_TYPE>>>
           partitioned_data;
       for (size_t i = 0; i < num; i++) {
-        size_t predicted_idx = ROBIN_BOUND(
+        size_t predicted_idx = TOLI_BOUND(
             0, size_t(key_value[i].first * model_slope_ + model_intercept_),
             partition_num_ - 1);
         partitioned_data[predicted_idx].push_back(key_value[i]);
@@ -161,7 +161,7 @@ public:
           heuristic_upper_bound(partition_key_, partition_num_ - 1, key);
       return index_[idx]->get(key, val, param);
     } else {
-      size_t predicted_idx = ROBIN_BOUND(
+      size_t predicted_idx = TOLI_BOUND(
           0, size_t(key * model_slope_ + model_intercept_), partition_num_ - 1);
       return index_[predicted_idx]->get(key, val, param);
     }
@@ -174,7 +174,7 @@ public:
           heuristic_upper_bound(partition_key_, partition_num_ - 1, key);
       return index_[idx]->put(key, value, param);
     } else {
-      size_t predicted_idx = ROBIN_BOUND(
+      size_t predicted_idx = TOLI_BOUND(
           0, size_t(key * model_slope_ + model_intercept_), partition_num_ - 1);
       return index_[predicted_idx]->put(key, value, param);
     }
@@ -187,7 +187,7 @@ public:
           heuristic_upper_bound(partition_key_, partition_num_ - 1, key);
       return index_[idx]->update(key, value, param);
     } else {
-      size_t predicted_idx = ROBIN_BOUND(
+      size_t predicted_idx = TOLI_BOUND(
           0, size_t(key * model_slope_ + model_intercept_), partition_num_ - 1);
       return index_[predicted_idx]->update(key, value, param);
     }
@@ -200,7 +200,7 @@ public:
           heuristic_upper_bound(partition_key_, partition_num_ - 1, key);
       return index_[idx]->remove(key, param);
     } else {
-      size_t predicted_idx = ROBIN_BOUND(
+      size_t predicted_idx = TOLI_BOUND(
           0, size_t(key * model_slope_ + model_intercept_), partition_num_ - 1);
       return index_[predicted_idx]->remove(key, param);
     }

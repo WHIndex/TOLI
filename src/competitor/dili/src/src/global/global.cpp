@@ -16,6 +16,7 @@
 
 
 const double CACHE_MISS_LOSS = 1;
+
 long totalDataSize = 200000000l;
 long halfN = totalDataSize / 2;
 const long n_query_keys = 1000000l;
@@ -30,7 +31,12 @@ const double R2 = 17.0 / 130.0;
 const double R3 = 5.0 / 130.0;
 
 
-const int fanThreashold = 8192;
+// const int fanThreashold = 8192;
+
+#ifndef DILI_FAN_THRESHOLD
+#define DILI_FAN_THRESHOLD 8192
+#endif
+
 //const int minFan = 2;
 //const int LEAF_MAX_CAPACIY = 8192;
 
@@ -42,9 +48,24 @@ const int fanThreashold = 8192;
 //const int maxFan = 2048;
 //const int minFanforSplit = 16;
 
+#ifndef DILI_RHO
+#define DILI_RHO 0.1
+#endif
 
-double RHO = 0.1;
-int buMinFan = 16;
+#ifndef DILI_BU_MIN_FAN
+#define DILI_BU_MIN_FAN 16
+#endif
+
+// #ifndef DILI_MAX_EXPANDING_RATIO
+// #define DILI_MAX_EXPANDING_RATIO 6
+// #endif
+
+// #ifndef DILI_RETRAIN_THRESHOLD
+// #define DILI_RETRAIN_THRESHOLD 2
+// #endif
+
+// double RHO = 0.1;
+// int buMinFan = 16;
 double max_expanding_ratio = 6;
 double retrain_threshold = 2;
 

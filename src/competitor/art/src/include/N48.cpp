@@ -5,7 +5,7 @@
 namespace ART_unsynchronized {
 
     bool N48::insert(uint8_t key, N *n) {
-        if (count == 48) {
+        if (count == NODE48_MAX) {
             return false;
         }
         unsigned pos = count;
@@ -91,7 +91,7 @@ namespace ART_unsynchronized {
 
     long N48::size() {
         long size = 0;
-        for(int i = 0; i < 48; i++) {
+        for(int i = 0; i < NODE48_MAX; i++) {
             size += N::size(children[i]);
             size += sizeof(children[i]);
         }

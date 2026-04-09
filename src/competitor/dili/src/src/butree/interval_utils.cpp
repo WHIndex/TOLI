@@ -1281,8 +1281,8 @@ void build_mirror_from_given_layout(const keyArray &X, const doubleArray &probs,
         doubleVec h0_rmses;
         bool restore_status = restore_complete_borders(mirror_dir, 0, h0_borders);
         if (!restore_status) {
-//            get_complete_partition_borders(X, probs, N, 0, 32, fanThreashold/2, h0_borders, h0_rmses, interval_type);
-            get_complete_partition_borders(X, probs, N, 0, buMinFan, fanThreashold/2, h0_borders, h0_rmses, interval_type);
+//            get_complete_partition_borders(X, probs, N, 0, 32, DILI_FAN_THRESHOLD/2, h0_borders, h0_rmses, interval_type);
+            get_complete_partition_borders(X, probs, N, 0, DILI_BU_MIN_FAN, DILI_FAN_THRESHOLD/2, h0_borders, h0_rmses, interval_type);
             string h0_borders_path = mirror_dir + "/h0_borders";
             data_utils::save_vec_data(h0_borders_path.c_str(), h0_borders);
 
@@ -1318,8 +1318,8 @@ void build_mirror_from_given_layout(const keyArray &X, const doubleArray &probs,
         doubleVec hi_rmses;
         bool restore_status = restore_complete_borders(mirror_dir, i, hi_borders);
         if (!restore_status) {
-            get_complete_partition_borders(topX, NULL, curr_n_nodes, i, 100, fanThreashold, hi_borders, hi_rmses, interval_type);
-//            get_complete_partition_borders(topX, NULL, curr_n_nodes, i, buMinFan * 2, fanThreashold, hi_borders, hi_rmses, interval_type);
+            get_complete_partition_borders(topX, NULL, curr_n_nodes, i, 100, DILI_FAN_THRESHOLD, hi_borders, hi_rmses, interval_type);
+//            get_complete_partition_borders(topX, NULL, curr_n_nodes, i, DILI_BU_MIN_FAN * 2, DILI_FAN_THRESHOLD, hi_borders, hi_rmses, interval_type);
         }
         long hi_min_size = hi_borders.back();
         hi_borders.pop_back();
@@ -1719,13 +1719,13 @@ void build_ideal_mirror(const keyArray &X, const doubleArray &probs, long N, l_m
     if (mirror.size() <= 0) {
         bool restore_status = restore_complete_borders_and_losses(mirror_dir, 0, h0_borders, h0_rmses);
         if (!restore_status) {
-//            get_complete_partition_borders(X, probs, N, 0, 32, fanThreashold/2, h0_borders, h0_rmses, interval_type);
+//            get_complete_partition_borders(X, probs, N, 0, 32, DILI_FAN_THRESHOLD/2, h0_borders, h0_rmses, interval_type);
             // cout << "Building BU-Tree...... This step may take several minutes but will be executed once only." << endl;
 
             auto start = chrono::system_clock::now();
-            get_complete_partition_borders(X, probs, N, 0, buMinFan, fanThreashold/2, h0_borders, h0_rmses, interval_type);
-//            get_complete_partition_borders_for_lowest_layer(X, N, 0, buMinFan, fanThreashold/2, h0_borders, h0_rmses, interval_type);
-//            get_complete_partition_borders_w_sampling(X, N, 0, buMinFan, fanThreashold/2, h0_borders, h0_rmses, interval_type);
+            get_complete_partition_borders(X, probs, N, 0, DILI_BU_MIN_FAN, DILI_FAN_THRESHOLD/2, h0_borders, h0_rmses, interval_type);
+//            get_complete_partition_borders_for_lowest_layer(X, N, 0, buMinFan, DILI_FAN_THRESHOLD/2, h0_borders, h0_rmses, interval_type);
+//            get_complete_partition_borders_w_sampling(X, N, 0, buMinFan, DILI_FAN_THRESHOLD/2, h0_borders, h0_rmses, interval_type);
             auto stop = chrono::system_clock::now();
             auto duration = chrono::duration_cast<chrono::seconds>(stop - start);
             double response_time = static_cast<double>(duration.count());
@@ -1751,7 +1751,7 @@ void build_ideal_mirror(const keyArray &X, const doubleArray &probs, long N, l_m
 
         long est_next_n_nodes = 0;
         double h0_loss = 0;
-        long est_n_nodes = estimate_ideal_layout(0, N, h0_rmses, N, h0_rmses, buMinFan, 200, 100, 10000, RHO, est_next_n_nodes, h0_loss);
+        long est_n_nodes = estimate_ideal_layout(0, N, h0_rmses, N, h0_rmses, DILI_BU_MIN_FAN, 200, 100, 10000, DILI_RHO, est_next_n_nodes, h0_loss);
 
         mirror.push_back(longVec());
         assert(h0_min_size < est_n_nodes);
@@ -1787,15 +1787,15 @@ void build_ideal_mirror(const keyArray &X, const doubleArray &probs, long N, l_m
         double root_lin_loss = root_rmse / 4;
         double root_bin_loss = (root_rmse > 2) ? 2 * log(root_rmse) / log(2.0) : 2;
         double root_loss = std::min<double>(root_lin_loss, root_bin_loss);
-        root_loss *= (1 + R2) * pow(RHO, curr_h);
+        root_loss *= (1 + R2) * pow(DILI_RHO, curr_h);
 //        // cout << "curr_h = " << curr_h << ", root_loss = " << root_loss << endl;
 
         longVec hi_borders;
         doubleVec hi_rmses;
         bool restore_status = restore_complete_borders(mirror_dir, curr_h, hi_borders);
         if (!restore_status) {
-            get_complete_partition_borders(topX, nullptr, curr_n_nodes, curr_h, 100, fanThreashold/2, hi_borders, hi_rmses, interval_type);
-//            get_complete_partition_borders(topX, NULL, curr_n_nodes, curr_h, buMinFan * 2, fanThreashold/2, hi_borders, hi_rmses, interval_type);
+            get_complete_partition_borders(topX, nullptr, curr_n_nodes, curr_h, 100, DILI_FAN_THRESHOLD/2, hi_borders, hi_rmses, interval_type);
+//            get_complete_partition_borders(topX, NULL, curr_n_nodes, curr_h, buMinFan * 2, DILI_FAN_THRESHOLD/2, hi_borders, hi_rmses, interval_type);
         }
 
         long hi_min_size = hi_borders.back();
@@ -1804,7 +1804,7 @@ void build_ideal_mirror(const keyArray &X, const doubleArray &probs, long N, l_m
 
         long est_next_n_nodes = 0;
         double hi_loss = 0;
-        long est_n_nodes = estimate_ideal_layout(curr_h, curr_n_nodes, hi_rmses, N, h0_rmses, 100, 10000, 100, 10000, RHO, est_next_n_nodes, hi_loss);
+        long est_n_nodes = estimate_ideal_layout(curr_h, curr_n_nodes, hi_rmses, N, h0_rmses, 100, 10000, 100, 10000, DILI_RHO, est_next_n_nodes, hi_loss);
 //        long est_n_nodes = estimate_ideal_layout(curr_h, curr_n_nodes, hi_rmses, N, h0_rmses, buMinFan, 10000, 100, 10000, RHO, est_next_n_nodes, hi_loss);
 
 

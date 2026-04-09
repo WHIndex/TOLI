@@ -20,7 +20,12 @@ namespace btreeolc {
 
 enum class PageType : uint8_t { BTreeInner=1, BTreeLeaf=2 };
 
-static const uint64_t pageSize=512;
+#ifndef BTREEOLC_PAGESIZE
+#define BTREEOLC_PAGESIZE 512
+#endif
+static const uint64_t pageSize=BTREEOLC_PAGESIZE;
+
+// static const uint64_t pageSize=512;
 
 static std::atomic<std::size_t> innernodes_cnt;
 static std::atomic<std::size_t> leaves_cnt;

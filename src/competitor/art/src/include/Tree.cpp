@@ -593,7 +593,7 @@ namespace ART_unsynchronized {
                     case NTypes::N4: {
                         type_distribution[static_cast<int>(NTypes::N4)]++;
                         auto n = static_cast<N4 *>(cur_node);
-                        for (uint8_t i = 0; i < 4; ++i) {
+                        for (uint8_t i = 0; i < NODE4_MAX; ++i) {
                             if (n->get_child(i) != nullptr) {
                                 q.push(n->get_child(i));
                                 d.push(cur_depth + 1);
@@ -604,7 +604,7 @@ namespace ART_unsynchronized {
                     case NTypes::N16: {
                         type_distribution[static_cast<int>(NTypes::N16)]++;
                         auto n = static_cast<N16 *>(cur_node);
-                        for (uint8_t i = 0; i < 16; ++i) {
+                        for (uint8_t i = 0; i < NODE16_MAX; ++i) {
                             if (n->get_child(i) != nullptr) {
                                 q.push(n->get_child(i));
                                 d.push(cur_depth + 1);
@@ -615,7 +615,7 @@ namespace ART_unsynchronized {
                     case NTypes::N48: {
                         type_distribution[static_cast<int>(NTypes::N48)]++;
                         auto n = static_cast<N48 *>(cur_node);
-                        for (uint8_t i = 0; i < 48; ++i) {
+                        for (uint8_t i = 0; i < NODE48_MAX; ++i) {
                             if (n->get_child(i) != nullptr) {
                                 q.push(n->get_child(i));
                                 d.push(cur_depth + 1);
@@ -707,7 +707,7 @@ namespace ART_unsynchronized {
                     case NTypes::N4: {
                         out_file << "N4,children=";
                         auto n = static_cast<N4 *>(cur_node);
-                        for (uint8_t i = 0; i < 4; ++i) {
+                        for (uint8_t i = 0; i < NODE4_MAX; ++i) {
                             if (n->get_child(i) != nullptr) {
                                 q.push(n->get_child(i));
                                 d.push(cur_depth + 1);
@@ -720,7 +720,7 @@ namespace ART_unsynchronized {
                     case NTypes::N16: {
                         out_file << "N16,children=";
                         auto n = static_cast<N16 *>(cur_node);
-                        for (uint8_t i = 0; i < 16; ++i) {
+                        for (uint8_t i = 0; i < NODE16_MAX; ++i) {
                             if (n->get_child(i) != nullptr) {
                                 q.push(n->get_child(i));
                                 d.push(cur_depth + 1);
@@ -733,7 +733,7 @@ namespace ART_unsynchronized {
                     case NTypes::N48: {
                         out_file << "N48,children=";
                         auto n = static_cast<N48 *>(cur_node);
-                        for (uint8_t i = 0; i < 48; ++i) {
+                        for (uint8_t i = 0; i < NODE48_MAX; ++i) {
                             if (n->get_child(i) != nullptr) {
                                 q.push(n->get_child(i));
                                 d.push(cur_depth + 1);

@@ -38,7 +38,7 @@ void buInterval::cal_merge_info(int h) {
     merge_lr->merge(lr, rSib->lr, fanout, rSib->fanout, data[start_idx]);
 
     if (h == 0) {
-        if (fanout + rSib->fanout > fanThreashold) {
+        if (fanout + rSib->fanout > DILI_FAN_THRESHOLD) {
             merge_metric = 1e50;
             return;
         }
@@ -62,7 +62,7 @@ void buInterval::cal_merge_info_w_sampling(int h) {
     merge_lr->merge_w_sampling(lr, rSib->lr, fanout, rSib->fanout, data[start_idx]);
 
     if (h == 0) {
-        if (fanout + rSib->fanout > fanThreashold) {
+        if (fanout + rSib->fanout > DILI_FAN_THRESHOLD) {
             merge_metric = 1e50;
             return;
         }
@@ -78,8 +78,8 @@ bool buInterval::merge_with_rSib(int h, bool if_merge_lr) {
     assert (rSib != NULL);
     ubd = rSib->ubd;
     if (h == 0) {
-        assert(fanout + rSib->fanout <= fanThreashold);
-        if (fanout + rSib->fanout > fanThreashold) {
+        assert(fanout + rSib->fanout <= DILI_FAN_THRESHOLD);
+        if (fanout + rSib->fanout > DILI_FAN_THRESHOLD) {
             merge_metric = 2e50;
             return false;
         }
