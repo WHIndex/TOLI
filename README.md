@@ -1,105 +1,106 @@
 # Tali
 
-Tali is a comprehensive benchmarking suite designed to evaluate the performance of learned and traditional indexes. It focuses on throughput/latency and size under various workloads, allowing you to configure the read/write ratio and test with datasets of different characteristics.
+Tali is a C++17 benchmark harness for learned index structures. The project
+centers on a single executable, `microbench`, which runs configurable online
+workloads and writes throughput, latency, memory, workload, and index-parameter
+metadata to CSV.
 
-## Prerequisites
+## Repository Layout
 
-To build and use Tali, ensure your system meets the following requirements:
+- `src/benchmark`: workload generation, flag parsing, timing, and CSV reporting.
+- `src/competitor`: adapters for the index implementations used by `microbench`.
+- `datasets`: download scripts and a synthetic key generator.
+- `cmake`: local find modules for external dependencies.
 
-- **GCC** 8.3.0 or later
-- **CMake** 3.14.0 or later
+## Supported Indexes
 
-### Required Dependencies
+Pass one or more index names with `--index`, separated by commas:
 
-- Intel MKL (2018.4.274)
-- Intel TBB (2020.3)
+```text
+alex, alexol, art, artolc, btree, btreeolc,
+dili, dpgm, dytis, finedex, lipp, lippol,
+masstree, pgm, sali, xindex
+```
+
+
+## Requirements
+
+- GCC 11.4.0 or newer
+- CMake 3.14 or newer
+- OpenMP
+- Intel MKL
+- Intel TBB
 - jemalloc
+- Boost components: `system`, `thread`, and `chrono`
 
-## Build Instructions
+## Build
 
-1. Create and navigate to the build directory:
+Initialize submodules before the first build:
 
-   ```bash
-   mkdir -p build
-   cd build
-   ```
+```bash
+git submodule update --init --recursive
+```
 
-2. Configure and build the project:
+Then configure and compile:
 
-   ```bash
-   cmake -DCMAKE_BUILD_TYPE=Release .. && make
-   ```
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build -j
+```
 
-## Quick Start
+Useful build-time knobs are exposed as CMake cache variables. For example,
+`K_MAX_DENSITY`, `ROOT_ERROR_BOUND`, `LIPP_THRESHOLD1`, `SALI_THRESHOLD1`,
+`PGM_EPSILON`, and `BTREE_LEAF_SLOTS` are forwarded into the benchmark binary
+as compile-time constants.
 
-To begin benchmarking with Tali, you can calculate throughput using the following command:
+## Run
+
+All non-boolean options use `--key=value`. Boolean options are enabled by
+including the flag name, such as `--latency_sample` or `--memory`.
 
 ```bash
 ./build/microbench \
---keys_file=./data/dataset \
---keys_file_type={binary,text} \
---read=0.5 --insert=0.5 \
---operations_num=800000000 \
---table_size=-1 \
---init_table_ratio=0.5 \
---thread_num=24 \
---index=index_name \
+  --keys_file=./datasets/covid \
+  --keys_file_type=binary \
+  --read=0.8 \
+  --insert=0.2 \
+  --update=0 \
+  --delete=0 \
+  --scan=0 \
+  --operations_num=100000000 \
+  --table_size=-1 \
+  --init_table_ratio=0.5 \
+  --thread_num=24 \
+  --index=alex,xindex,sali \
+  --output_path=./out.csv
 ```
 
-### Explanation of Arguments:
+Unless a test suite mode is selected, the operation ratios must sum to `1.0`.
+`--thread_num` and `--index` accept comma-separated lists, so a single command
+can sweep multiple thread counts or index implementations.
 
-- `--keys_file`: Path to the dataset (can be binary or text format).
-- `--keys_file_type`: Specify the dataset type (`binary` or `text`).
-- `--read`: Read operation ratio (e.g., `0.5` for 50% reads).
-- `--insert`: Insert operation ratio (e.g., `0.5` for 50% inserts).
-- `--operations_num`: Total number of operations to run.
-- `--table_size`: Set the table size (set to `-1` to infer from the dataset).
-- `--init_table_ratio`: Ratio of the dataset to pre-load into the index at the start.
-- `--thread_num`: Number of threads to use for benchmarking.
-- `--index`: The index to test (specify the index name).
+## Output
 
-### Additional Options:
+Each run appends one CSV row. The report includes the workload mix, input paths,
+index name, throughput, initial table size, memory consumption, thread count,
+latency percentiles when sampling is enabled, random seed, scan length, dataset
+fitness metrics, partition settings, operation count, and selected per-index
+tuning parameters.
 
-- **Latency Measurement**:  
-   To collect latency samples, use the `--latency_sample` flag:
+## Datasets
 
-   ```bash
-   --latency_sample --latency_sample_ratio=0.01
-   ```
+Download helper scripts live in `datasets`:
 
-- **Range Queries**:  
-   If you'd like to test range queries (e.g., scanning 100 entries), use:
+```bash
+cd datasets
+bash download.sh
+```
 
-   ```bash
-   --scan_ratio=1 --scan_num=100
-   ```
+The synthetic generator can be built independently:
 
-- **Zipfian Distribution**:  
-   To perform lookups with a Zipfian distribution:
+```bash
+g++ --std=c++17 generator.cpp -o generator
+./generator {le} {ge} {lv} {gv} {num} {path}
+```
 
-   ```bash
-   --sample_distribution=zipf
-   ```
-
-- **Data Shift Experiment**:  
-   To preserve the original order in the dataset (no shuffling of keys), enable data-shift mode:
-
-   ```bash
-   --data_shift
-   ```
-
-- **Dataset Statistics**:  
-   To calculate dataset hardness using the PLA-metric with an error bound, use:
-
-   ```bash
-   --dataset_statistic --error_bound=32
-   ```
-
-- **Memory Consumption Measurement**:  
-   If your index supports memory consumption tracking, you can enable it with:
-
-   ```bash
-   --memory
-   ```
-
-All results will be saved in a CSV file, the location of which is specified via the `--output_path` flag.
+See `datasets/README.md` for dataset provenance and generator details.
