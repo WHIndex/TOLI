@@ -1,10 +1,10 @@
-# Toli
+# Tali
 
-Toli is a comprehensive benchmarking suite designed to evaluate the performance of learned and traditional indexes. It focuses on throughput/latency and size under various workloads, allowing you to configure the read/write ratio and test with datasets of different characteristics.
+Tali is a comprehensive benchmarking suite designed to evaluate the performance of learned and traditional indexes. It focuses on throughput/latency and size under various workloads, allowing you to configure the read/write ratio and test with datasets of different characteristics.
 
 ## Prerequisites
 
-To build and use Toli, ensure your system meets the following requirements:
+To build and use Tali, ensure your system meets the following requirements:
 
 - **GCC** 8.3.0 or later
 - **CMake** 3.14.0 or later
@@ -32,7 +32,7 @@ To build and use Toli, ensure your system meets the following requirements:
 
 ## Quick Start
 
-To begin benchmarking with Toli, you can calculate throughput using the following command:
+To begin benchmarking with Tali, you can calculate throughput using the following command:
 
 ```bash
 ./build/microbench \
@@ -103,4 +103,3 @@ To begin benchmarking with Toli, you can calculate throughput using the followin
    ```
 
 All results will be saved in a CSV file, the location of which is specified via the `--output_path` flag.
-
